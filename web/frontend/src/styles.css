@@ -1,0 +1,128 @@
+:root {
+  --bg: #0f1419; --card: #1a2129; --text: #e6edf3; --muted: #8b98a5;
+  --accent: #2f81f7; --ok: #3fb950; --warn: #d29922; --bad: #f85149;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--text);
+  -webkit-user-select: none; user-select: none; touch-action: manipulation;
+}
+html, body { overscroll-behavior: none; } /* chặn kéo-để-tải-lại khi đang lái */
+main {
+  margin: 0 auto; max-width: 480px;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+           max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+header { display: flex; justify-content: space-between; align-items: center; }
+h1 { font-size: 1.3rem; margin: 4px 0; }
+.links { display: flex; gap: 6px; }
+.pill { font-size: .75rem; padding: 3px 8px; border-radius: 999px; background: #30363d; color: var(--muted); }
+.pill.on { background: var(--ok); color: #fff; }
+.pill.off { background: var(--bad); color: #fff; }
+.card { background: var(--card); border-radius: 12px; padding: 12px; margin: 10px 0; }
+.label { color: var(--muted); font-size: .8rem; margin-top: 4px; }
+.telemetry { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.big { font-size: 2.6rem; font-weight: 700; }
+.big.near { color: var(--bad); }
+.mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+button {
+  font: inherit; color: var(--text); background: #30363d; border: 0;
+  border-radius: 10px; padding: 12px; cursor: pointer;
+}
+.mode-btn.active { background: var(--accent); }
+.pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.side > .pad { max-width: 320px; margin-left: auto; margin-right: auto; }
+.pad.disabled { opacity: .35; pointer-events: none; }
+.dir { font-size: 1.8rem; aspect-ratio: 1; touch-action: none; }
+.dir.pressed { background: var(--accent); }
+.dir.stop { background: var(--bad); }
+.hint { text-align: center; color: var(--muted); font-size: .8rem; margin: 0; }
+.settings label { display: block; margin: 6px 0 12px; }
+.settings input { width: 100%; }
+.log { list-style: none; padding: 0; margin: 4px 0 0; max-height: 160px; overflow: auto; font-size: .8rem; }
+.log li { padding: 2px 0; border-bottom: 1px solid #30363d; }
+.log li.warn { color: var(--warn); }
+.log li.error { color: var(--bad); }
+
+/* ---- Camera ---- */
+.camera-card { padding: 8px; }
+.camera-box {
+  position: relative; width: 100%; overflow: hidden;
+  background: #000; border-radius: 8px; outline: 2px solid transparent;
+  transition: outline-color .2s;
+}
+.camera-box.near { outline-color: var(--bad); }
+.camera-box:fullscreen { border-radius: 0; aspect-ratio: auto !important; }
+.camera-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+.camera-img.hidden { visibility: hidden; }
+.camera-placeholder {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  color: var(--muted); font-size: .9rem; text-align: center; padding: 12px;
+}
+.hud {
+  position: absolute; padding: 2px 8px; border-radius: 6px;
+  background: rgba(0, 0, 0, .55); color: #fff; font-size: .75rem; font-weight: 600;
+  font-variant-numeric: tabular-nums; letter-spacing: .02em;
+}
+.hud-tl { top: 8px; left: 8px; display: flex; align-items: center; gap: 6px; }
+.hud-tr { top: 8px; right: 8px; }
+.hud-bl { bottom: 8px; left: 8px; font-size: 1rem; }
+.hud-bl.warn { background: var(--bad); }
+.hud-br { bottom: 8px; right: 8px; color: var(--muted); }
+.rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bad); animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+.camera-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.camera-actions button, .button-link { padding: 8px; font-size: .85rem; }
+.button-link {
+  display: grid; place-items: center; border-radius: 10px;
+  background: #30363d; color: var(--text); text-decoration: none;
+}
+button:disabled { opacity: .4; cursor: default; }
+
+/* Máy tính / máy tính bảng: camera bên trái, điều khiển bên phải */
+@media (min-width: 900px) {
+  main {
+    max-width: 1100px; display: grid; gap: 0 16px;
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+    grid-template-areas: "header header" "camera side";
+  }
+  main > header { grid-area: header; }
+  main > .camera-card { grid-area: camera; align-self: start; }
+  main > .side { grid-area: side; }
+}
+
+/* ---- Điện thoại xoay ngang: chế độ lái ----
+   Camera chiếm phần lớn màn hình bên trái, cột điều khiển bên phải (cuộn được). */
+@media (orientation: landscape) and (max-height: 540px) {
+  main {
+    max-width: none; height: 100dvh; overflow: hidden;
+    display: grid; gap: 0 10px;
+    grid-template-columns: minmax(0, 1fr) min(42vw, 300px);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "header header" "camera side";
+    padding-top: max(6px, env(safe-area-inset-top));
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+  main > header { grid-area: header; }
+  main > header h1 { font-size: 1rem; }
+  main > .camera-card {
+    grid-area: camera; margin: 4px 0 0; padding: 0; background: none;
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  main > .camera-card .camera-box { flex: 1; aspect-ratio: auto !important; min-height: 0; }
+  main > .camera-card .camera-actions { margin-top: 6px; }
+  main > .camera-card .camera-actions button,
+  main > .camera-card .button-link { padding: 6px; }
+  .telemetry { display: none; } /* đã có HUD trên camera */
+  .side {
+    grid-area: side; overflow-y: auto; min-height: 0;
+    display: flex; flex-direction: column;
+  }
+  .side .card { margin: 4px 0 6px; padding: 8px; }
+  .side .pad { gap: 6px; max-width: 240px; width: 100%; margin-left: auto; margin-right: auto; }
+  .side .dir { font-size: 1.4rem; aspect-ratio: auto; height: clamp(44px, 17dvh, 72px); padding: 0; }
+  .side .hint { display: none; }
+  .side .mode-switch button { padding: 8px; }
+}

@@ -1,0 +1,17 @@
+# Cài:  sudo cp deploy/smartcar.service /etc/systemd/system/
+#       sudo systemctl daemon-reload && sudo systemctl enable --now smartcar
+[Unit]
+Description=Smart Car controller
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/VatLy_SmartCar/car
+EnvironmentFile=/home/pi/VatLy_SmartCar/car/.env
+ExecStart=/home/pi/VatLy_SmartCar/car/.venv/bin/python -m smartcar
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
